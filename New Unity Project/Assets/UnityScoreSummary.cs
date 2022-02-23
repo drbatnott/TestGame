@@ -10,19 +10,47 @@ public class UnityScoreSummary : MonoBehaviour
     public class ScoreSummary
     {
         double highScore;
-        public double HighScore { get { return highScore; } }
-        public ScoreSummary(double hs = 0)
+        string bestTime;
+        public double HighScore { get { return highScore; }
+            set { if (highScore < value) highScore = value; }
+        }
+
+        public string BestTime { get { return bestTime; } 
+            set
+            {
+                if (value.Contains(":"))
+                {
+                    string[] parts = value.Split(':');
+                    string[] bestParts = bestTime.Split(':');
+                    int bestMins = Int32.Parse(bestParts[0]);
+                    double bestSecs = double.Parse(bestParts[1]);
+                    int valueMins = Int32.Parse(parts[0]);
+                    double valueSecs = double.Parse(parts[1]);
+                    bestSecs += 60 * bestMins;
+                    valueSecs += 60 * valueMins;
+                    if (bestSecs > valueSecs)
+                    {
+                        bestTime = value;
+                        
+                    }
+                }
+            }
+        }
+        public ScoreSummary(double hs = 0, string _bestTime = "99:59")
         {
             highScore = hs;
+            bestTime = _bestTime;
         }
     }
     ScoreSummary scoreSummary;
     public Text highScoreText;
+    public Text bestTimeText;
     float timeNowSecs;
     int timeNowMins;
     bool running;
     string timeString;
     string totalTime;
+    string bestTime;
     void DisplayTime()
     {
         timeNowSecs += Time.deltaTime;
@@ -46,8 +74,11 @@ public class UnityScoreSummary : MonoBehaviour
         double hs = double.Parse(parts[1]);
         scoreSummary = new ScoreSummary(hs);
         Debug.Log(scoreSummary.HighScore);
-        highScoreText.text = "High score " + scoreSummary.HighScore;
+        highScoreText.text = "High Score " + scoreSummary.HighScore;
         Debug.Log(highScoreText.text);
+        bestTime = scoreSummary.BestTime;
+        Debug.Log(bestTime);
+        bestTimeText.text = "Best Time " + bestTime;
         running = false;
         timeString = "";
         /*
@@ -84,6 +115,9 @@ public class UnityScoreSummary : MonoBehaviour
         running = false;
         totalTime = timeNowMins + ":" + timeString;
         Debug.Log(totalTime);
+        scoreSummary.BestTime = totalTime;
+        Debug.Log(scoreSummary.BestTime);
+        bestTimeText.text = "Best Time " + scoreSummary.BestTime;
         totalTime = "";
         timeNowSecs = 0;
         timeNowMins = 0;
